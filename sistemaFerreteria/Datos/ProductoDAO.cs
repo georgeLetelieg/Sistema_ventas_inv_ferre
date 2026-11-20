@@ -60,6 +60,63 @@ namespace SistemaFerreteria.Datos
             return lista;
         }
 
+        public bool Actualizar(Producto prod)
+        {
+            string sql = @"UPDATE productos 
+                   SET nombre = @nombre, 
+                       precio = @precio, 
+                       stock = @stock, 
+                       marca = @marca, 
+                       garantia_meses = @garantia, 
+                       unidad_medida = @unidad, 
+                       requiere_despacho = @despacho
+                   WHERE codigo = @codigo";
+
+            using (MySqlConnection conn = Conexion.ObtenerConexion())
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@codigo", prod.Codigo);
+                    cmd.Parameters.AddWithValue("@nombre", prod.Nombre);
+                    cmd.Parameters.AddWithValue("@precio", prod.PrecioNeto);
+                    cmd.Parameters.AddWithValue("@stock", prod.Stock);
+
+                    if (prod is Herramienta h)
+                    {
+                        cmd.Parameters.AddWithValue("@marca", h.Marca);
+                        cmd.Parameters.AddWithValue("@garantia", h.MesesGarantia);
+                        cmd.Parameters.AddWithValue("@unidad", DBNull.Value);
+                        cmd.Parameters.AddWithValue("@despacho", DBNull.Value);
+                    }
+                    else if (prod is Material m)
+                    {
+                        cmd.Parameters.AddWithValue("@marca", DBNull.Value);
+                        cmd.Parameters.AddWithValue("@garantia", DBNull.Value);
+                        cmd.Parameters.AddWithValue("@unidad", m.UnidadMedida);
+                        cmd.Parameters.AddWithValue("@despacho", m.RequiereDespacho);
+                    }
+
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
+        public bool Eliminar(string codigo)
+        {
+            string sql = "DELETE FROM productos WHERE codigo = @codigo";
+
+            using (MySqlConnection conn = Conexion.ObtenerConexion())
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@codigo", codigo);
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
         // Operación 2: Agregar (Usa parámetros obligatorios para evitar inyección SQL)
         public void Insertar(Producto p)
         {

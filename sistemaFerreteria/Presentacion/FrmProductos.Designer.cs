@@ -17,6 +17,9 @@ namespace SistemaFerreteria.Presentacion
         private System.Windows.Forms.TextBox txtUnidadMedida;
         private System.Windows.Forms.CheckBox chkDespacho;
         private System.Windows.Forms.Button btnGuardar;
+        private System.Windows.Forms.Button btnEditar;
+        private System.Windows.Forms.Button btnEliminar;
+        private System.Windows.Forms.Button btnLimpiar;
         private System.Windows.Forms.GroupBox gbComunes;
         private System.Windows.Forms.GroupBox gbEspecificos;
         private System.Windows.Forms.Label lblCodigo, lblNombre, lblPrecio, lblStock, lblTipo, lblMarca, lblGarantia, lblUnidad;
@@ -32,6 +35,9 @@ namespace SistemaFerreteria.Presentacion
 
         private void InitializeComponent()
         {
+            this.btnEditar = new System.Windows.Forms.Button();
+            this.btnEliminar = new System.Windows.Forms.Button();
+            this.btnLimpiar = new System.Windows.Forms.Button();
             this.dgvProductos = new System.Windows.Forms.DataGridView();
             this.cmbTipo = new System.Windows.Forms.ComboBox();
             this.txtCodigo = new System.Windows.Forms.TextBox();
@@ -60,6 +66,7 @@ namespace SistemaFerreteria.Presentacion
             // 
             // dgvProductos
             // 
+            this.dgvProductos.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvProductos_CellClick);
             this.dgvProductos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvProductos.Location = new System.Drawing.Point(12, 12);
             this.dgvProductos.Name = "dgvProductos";
@@ -140,6 +147,26 @@ namespace SistemaFerreteria.Presentacion
             // 
             // btnGuardar
             // 
+            // Botón Editar
+            this.btnEditar.Location = new System.Drawing.Point(530, 360);
+            this.btnEditar.Name = "btnEditar";
+            this.btnEditar.Size = new System.Drawing.Size(110, 40);
+            this.btnEditar.Text = "Editar";
+            this.btnEditar.Click += new System.EventHandler(this.btnEditar_Click);
+
+            // Botón Eliminar
+            this.btnEliminar.Location = new System.Drawing.Point(650, 360);
+            this.btnEliminar.Name = "btnEliminar";
+            this.btnEliminar.Size = new System.Drawing.Size(110, 40);
+            this.btnEliminar.Text = "Eliminar";
+            this.btnEliminar.Click += new System.EventHandler(this.btnEliminar_Click);
+
+            // Botón Limpiar (opcional, debajo de btnGuardar o al lado)
+            this.btnLimpiar.Location = new System.Drawing.Point(290, 360);
+            this.btnLimpiar.Name = "btnLimpiar";
+            this.btnLimpiar.Size = new System.Drawing.Size(90, 40);
+            this.btnLimpiar.Text = "Limpiar";
+            this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click);
             this.btnGuardar.Location = new System.Drawing.Point(400, 360);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(120, 40);
@@ -253,6 +280,9 @@ namespace SistemaFerreteria.Presentacion
             this.Controls.Add(this.gbComunes);
             this.Controls.Add(this.dgvProductos);
             this.Controls.Add(this.btnGuardar);
+            this.Controls.Add(this.btnEditar);
+            this.Controls.Add(this.btnEliminar);
+            this.Controls.Add(this.btnLimpiar);
             this.Name = "FrmProductos";
             this.Text = "Mantenedor de Productos";
             this.Load += new System.EventHandler(this.FrmProductos_Load);

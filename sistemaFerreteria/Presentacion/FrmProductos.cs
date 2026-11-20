@@ -117,5 +117,136 @@ namespace SistemaFerreteria.Presentacion
                 MessageBox.Show("Error al guardar en la base de datos: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        // Al hacer clic en una fila de la grilla, carga los datos en las cajas de texto
+        private void dgvProductos_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            Producto seleccionado = dgvProductos.Rows[e.RowIndex].DataBoundItem as Producto;
+            if (seleccionado == null) return;
+
+            txtCodigo.Text = seleccionado.Codigo;
+            txtCodigo.Enabled = false; // Se bloquea el código porque es la clave para editar/eliminar
+            txtNombre.Text = seleccionado.Nombre;
+            txtPrecio.Text = seleccionado.PrecioNeto.ToString();
+            txtStock.Text = seleccionado.Stock.ToString();
+
+            if (seleccionado is Herramienta h)
+            {
+                cmbTipo.SelectedItem = "HERRAMIENTA";
+                txtMarca.Text = h.Marca;
+                txtGarantia.Text = h.MesesGarantia.ToString();
+            }
+            else if (seleccionado is Material m)
+            {
+                cmbTipo.SelectedItem = "MATERIAL";
+                txtUnidadMedida.Text = m.UnidadMedida;
+                chkDespacho.Checked = m.RequiereDespacho;
+            }
+        }
+
+        private void btnEditar_Click(object sender, EventArgs e)
+        {
+            if (txtCodigo.Enabled || string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                MessageBox.Show("Selecciona primero un producto de la tabla para editar.", "Aviso");
+                return;
+            }
+
+            try
+            {
+                decimal precio = decimal.Parse(txtPrecio.Text);
+                int stock = int.Parse(txtStock.Text);
+                Producto prod;
+
+                if (cmbTipo.SelectedItem.ToString() == "HERRAMIENTA")
+                {
+                    prod = new Herramienta
+                    {
+                        Codigo = txtCodigo.Text,
+                        Nombre = txtNombre.Text,
+                        PrecioNeto = precio,
+                        Stock = stock,
+                        Marca = txtMarca.Text,
+                        MesesGarantia = int.Parse(txtGarantia.Text)
+                    };
+                }
+                else
+                {
+                    prod = new Material
+                    {
+                        Codigo = txtCodigo.Text,
+                        Nombre = txtNombre.Text,
+                        PrecioNeto = precio,
+                        Stock = stock,
+                        UnidadMedida = txtUnidadMedida.Text,
+                        RequiereDespacho = chkDespacho.Checked
+                    };
+                }
+
+                if (_dao.Actualizar(prod))
+                {
+                    MessageBox.Show("Producto actualizado correctamente.", "Éxito");
+                    CargarGrilla(); // Usa el nombre exacto de tu método que recarga la grilla
+                    LimpiarCampos();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al editar: " + ex.Message, "Error");
+            }
+        }
+
+        private void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (txtCodigo.Enabled || string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                MessageBox.Show("Selecciona primero un producto de la tabla para eliminar.", "Aviso");
+                return;
+            }
+
+            DialogResult respuesta = MessageBox.Show(
+                $"¿Seguro que deseas eliminar el producto {txtCodigo.Text}?",
+                "Confirmar eliminación",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (respuesta == DialogResult.Yes)
+            {
+                try
+                {
+                    if (_dao.Eliminar(txtCodigo.Text))
+                    {
+                        MessageBox.Show("Producto eliminado.", "Éxito");
+                        CargarGrilla(); // Usa el nombre exacto de tu método que recarga la grilla
+                        LimpiarCampos();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("No se pudo eliminar (puede estar asociado a una venta): " + ex.Message, "Error");
+                }
+            }
+        }
+
+        private void btnLimpiar_Click(object sender, EventArgs e)
+        {
+            LimpiarCampos();
+        }
+
+        private void LimpiarCampos()
+        {
+            txtCodigo.Enabled = true;
+            txtCodigo.Clear();
+            txtNombre.Clear();
+            txtPrecio.Clear();
+            txtStock.Clear();
+            txtMarca.Clear();
+            txtGarantia.Clear();
+            txtUnidadMedida.Clear();
+            chkDespacho.Checked = false;
+            txtCodigo.Focus();
+        }
     }
 }
